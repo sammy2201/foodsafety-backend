@@ -29,9 +29,11 @@ export const createTestResult = async (data: any) => {
   // handle facility first
   let facility;
   if (facilityName) {
-    facility = await Facility.findOne({ where: { name: facilityName } });
+    facility = await Facility.findOne({
+      where: { name: facilityName.toLowerCase() },
+    });
     if (!facility) {
-      facility = await Facility.create({ name: facilityName });
+      facility = await Facility.create({ name: facilityName.toLowerCase() });
     }
   }
 
@@ -39,12 +41,15 @@ export const createTestResult = async (data: any) => {
   let line;
   if (facility) {
     line = await ProductionLine.findOne({
-      where: { name: productionLineName, facilityId: facility.id },
+      where: {
+        name: productionLineName.toLowerCase(),
+        facilityId: facility.id,
+      },
     });
     if (!line) {
       line = await ProductionLine.create({
-        name: productionLineName,
-        facilityId: facility?.id,
+        name: productionLineName.toLowerCase(),
+        facilityId: facility.id,
       });
     }
   }
