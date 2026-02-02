@@ -14,7 +14,7 @@ export const sequelize = new Sequelize(
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false, // For self-signed certs
+        rejectUnauthorized: false,
       },
     },
     port: parseInt(process.env.DB_PORT as string, 10) || 5432,

@@ -16,6 +16,7 @@ Facility.init(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
   },
   { sequelize, tableName: "facilities" },

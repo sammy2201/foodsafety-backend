@@ -1,10 +1,10 @@
 // routes.ts
 import { Router } from "express";
-import * as controller from "../controllers/testResults.controller";
+import { create, getAll } from "../controllers/testResults.controller";
 
 const router = Router();
 
-router.post("/test-results", controller.create);
-router.get("/test-results", controller.getAll);
+router.post("/test-results", create);
+router.get("/test-results", getAll);
 
 export default router;

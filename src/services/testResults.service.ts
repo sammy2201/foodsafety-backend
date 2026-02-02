@@ -1,4 +1,3 @@
-// services/testResults.service.ts
 import { TestResult } from "../models/TestResult";
 import { ProductionLine } from "../models/ProductionLine";
 import { Facility } from "../models/Facility";
@@ -27,7 +26,7 @@ export const createTestResult = async (data: any) => {
     throw new Error("CFU count must be >= 0");
   }
 
-  // Optional: handle facility first
+  // handle facility first
   let facility;
   if (facilityName) {
     facility = await Facility.findOne({ where: { name: facilityName } });
@@ -36,26 +35,25 @@ export const createTestResult = async (data: any) => {
     }
   }
 
-  // Handle production line
+  // handle production line
   let line;
   if (facility) {
     line = await ProductionLine.findOne({
       where: { name: productionLineName, facilityId: facility.id },
     });
-  } else {
-    line = await ProductionLine.findOne({
-      where: { name: productionLineName },
-    });
+    if (!line) {
+      line = await ProductionLine.create({
+        name: productionLineName,
+        facilityId: facility?.id,
+      });
+    }
   }
 
-  if (!line) {
-    line = await ProductionLine.create({
-      name: productionLineName,
-      facilityId: facility?.id ?? null,
-    });
+  if (line === undefined) {
+    throw new Error("Production line could not be saved");
   }
 
-  // Create the test result
+  // create the test result
   return TestResult.create({
     productionLineId: line.id,
     cfuCount,
@@ -67,12 +65,11 @@ export const createTestResult = async (data: any) => {
 export const getTestResults = async (query: any) => {
   const { facilityId, productionLineId, from, to } = query;
 
-  // 1. Fetch all test results including relations
+  // fetch all test results
   const allResults: TestResultWithRelations[] = await TestResult.findAll({
     include: [
       {
         model: ProductionLine,
-
         include: [
           {
             model: Facility,
@@ -83,29 +80,27 @@ export const getTestResults = async (query: any) => {
     order: [["testedAt", "DESC"]],
   });
 
-  console.log(allResults.map((r) => r.toJSON()));
-
-  // 2. Apply filters in-memory using array.filter
+  // Apply filters
   let filtered = allResults;
 
   if (facilityId) {
     filtered = filtered.filter(
-      (r) => r.ProductionLine?.Facility?.id === facilityId,
+      (i) => i.ProductionLine?.Facility?.id === facilityId,
     );
   }
 
   if (productionLineId) {
-    filtered = filtered.filter((r) => r.productionLineId === productionLineId);
+    filtered = filtered.filter((i) => i.productionLineId === productionLineId);
   }
 
   if (from) {
     const fromDate = new Date(from);
-    filtered = filtered.filter((r) => new Date(r.testedAt) >= fromDate);
+    filtered = filtered.filter((i) => new Date(i.testedAt) >= fromDate);
   }
 
   if (to) {
     const toDate = new Date(to);
-    filtered = filtered.filter((r) => new Date(r.testedAt) <= toDate);
+    filtered = filtered.filter((i) => new Date(i.testedAt) <= toDate);
   }
 
   return {
