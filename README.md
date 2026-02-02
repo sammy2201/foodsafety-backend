@@ -119,6 +119,35 @@ Example:
 GET /api/test-results?from=2026-02-01&to=2026-02-28
 ```
 
+## How to Run the Application (Without Docker)
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- Node.js (v20 or later)
+- npm
+- A PostgreSQL database (Supabase or local)
+
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```
+DB_USER=xxxx
+DB_PASS=xxxx
+DB_HOST=xxx
+DB_PORT=xxx
+DB_NAME=xxx
+```
+
+### Run the app
+
+```
+npm install
+npx ts-node src/index.ts
+```
+
 ## Filtering Strategy (Simple & Clear)
 
 - Database filtering is used for:
