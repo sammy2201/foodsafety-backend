@@ -1,0 +1,51 @@
+
+# Node.js dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# TypeScript specific
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.*  # If you use multiple .env files, like .env.production, .env.test, etc.
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Miscellaneous
+*.log
+*.tmp
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm package lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+#terraform to avoid committing the state file
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+
+
