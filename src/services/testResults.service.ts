@@ -3,6 +3,17 @@ import { TestResult } from "../models/TestResult";
 import { ProductionLine } from "../models/ProductionLine";
 import { Facility } from "../models/Facility";
 
+type TestResultWithRelations = TestResult & {
+  ProductionLine?: {
+    id: string;
+    name: string;
+    Facility?: {
+      id: string;
+      name: string;
+    };
+  };
+};
+
 export const createTestResult = async (data: any) => {
   const { facilityName, productionLineName, cfuCount, location, testedAt } =
     data;
@@ -53,30 +64,52 @@ export const createTestResult = async (data: any) => {
   });
 };
 
-export const getTestResultsSimple = async (allResults: any[], query: any) => {
+export const getTestResults = async (query: any) => {
   const { facilityId, productionLineId, from, to } = query;
 
+  // 1. Fetch all test results including relations
+  const allResults: TestResultWithRelations[] = await TestResult.findAll({
+    include: [
+      {
+        model: ProductionLine,
+
+        include: [
+          {
+            model: Facility,
+          },
+        ],
+      },
+    ],
+    order: [["testedAt", "DESC"]],
+  });
+
+  console.log(allResults.map((r) => r.toJSON()));
+
+  // 2. Apply filters in-memory using array.filter
   let filtered = allResults;
 
-  // Filter by production line ID
+  if (facilityId) {
+    filtered = filtered.filter(
+      (r) => r.ProductionLine?.Facility?.id === facilityId,
+    );
+  }
+
   if (productionLineId) {
     filtered = filtered.filter((r) => r.productionLineId === productionLineId);
   }
 
-  // Filter by facility ID
-  if (facilityId) {
-    filtered = filtered.filter((r) => r.facilityId === facilityId);
-  }
-
-  // Filter by date range
   if (from) {
     const fromDate = new Date(from);
     filtered = filtered.filter((r) => new Date(r.testedAt) >= fromDate);
   }
+
   if (to) {
     const toDate = new Date(to);
     filtered = filtered.filter((r) => new Date(r.testedAt) <= toDate);
   }
 
-  return filtered;
+  return {
+    data: filtered,
+    meta: { total: filtered.length },
+  };
 };
