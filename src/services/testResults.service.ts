@@ -8,11 +8,12 @@ type TestResultWithRelations = TestResult & {
     name: string;
     Facility?: {
       id: string;
+
       name: string;
     };
   };
 };
-
+// #rdf
 export const createTestResult = async (data: any) => {
   const { facilityName, productionLineName, cfuCount, location, testedAt } =
     data;
